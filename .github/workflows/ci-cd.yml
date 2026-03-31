@@ -3,10 +3,19 @@ name: CI-CD
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+
+    # ✅ Ajouter Redis comme service pour les tests unitaires
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
 
     steps:
       # 1. Récupérer le code
@@ -16,7 +25,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       # 3. Installer les dépendances
       - name: Install dependencies

@@ -1,11 +1,11 @@
-import os
 from flask import Flask
 import redis
+import os
 import time
 
 app = Flask(__name__)
 
-# Récupère le host Redis depuis la variable d'environnement (default localhost)
+# Configuration Redis depuis les variables d'environnement
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 
