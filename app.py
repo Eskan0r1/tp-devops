@@ -1,13 +1,16 @@
 from flask import Flask
-import os
+import redis
 
 app = Flask(__name__)
 
+# Connection au service Redis (nom = service dans docker-compose)
+r = redis.Redis(host="redis", port=6379)
+
 @app.route("/")
 def home():
-    message = os.getenv("MESSAGE", "Hello Default")
-    return message
+    r.incr("counter")
+    return f"Visites : {r.get('counter').decode()}"
 
-# N’exécute pas le serveur si c’est importé (pour la CI)
+# N'exécute le serveur que si script lancé directement
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
