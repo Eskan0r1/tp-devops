@@ -6,16 +6,16 @@ class AppTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
 
-    @patch("app.redis.Redis")  # Mock Redis
-    def test_home(self, mock_redis_class):
-        # Crée un mock de Redis
-        mock_redis_instance = MagicMock()
-        mock_redis_instance.exists.return_value = True
-        mock_redis_instance.get.return_value = b"1"
-        mock_redis_class.return_value = mock_redis_instance
+    @patch("app.redis.Redis")  # Mock Redis pour le test
+    def test_home(self, mock_redis):
+        # Configure le mock pour retourner des valeurs réalistes
+        mock_instance = MagicMock()
+        mock_instance.exists.return_value = True
+        mock_instance.get.return_value = b"1"
+        mock_redis.return_value = mock_instance
 
         response = self.app.get('/')
-        self.assertIn("Visites :", response.data.decode())  # Vérifie que "Visites :" est dans la réponse
+        self.assertIn("Visites :", response.data.decode())
 
 if __name__ == "__main__":
     unittest.main()
