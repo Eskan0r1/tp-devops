@@ -1,21 +1,29 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Récupérer le code
       - uses: actions/checkout@v3
 
+      # Configurer Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
+      # Installer les dépendances
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test app
-        run: python3 -c "from app import app"
+      # Lancer les tests unitaires
+      - name: Run tests
+        run: python -m unittest discover tests

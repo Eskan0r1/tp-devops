@@ -3,13 +3,24 @@ import redis
 
 app = Flask(__name__)
 
-# Connection au service Redis (nom = service dans docker-compose)
-r = redis.Redis(host="redis", port=6379)
+# Connexion au service Redis (nom = service dans docker-compose)
+try:
+    r = redis.Redis(host="redis", port=6379)
+    r.ping()  # Vérifie que Redis est joignable
+except redis.exceptions.ConnectionError:
+    r = None
 
 @app.route("/")
 def home():
-    r.incr("counter")
-    return f"Visites : {r.get('counter').decode()}"
+    if r:
+        # Initialise le compteur si nécessaire
+        if not r.exists("counter"):
+            r.set("counter", 0)
+        r.incr("counter")
+        count = r.get("counter").decode()
+        return f"Visites : {count}"
+    else:
+        return "Redis non disponible", 500
 
 # N'exécute le serveur que si script lancé directement
 if __name__ == "__main__":

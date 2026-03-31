@@ -1,0 +1,45 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code
+      - uses: actions/checkout@v3
+
+      # 2. Configurer Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # 3. Installer les dépendances
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. Lancer les tests unitaires
+      - name: Run tests
+        run: python -m unittest discover tests
+
+      # 5. Build Docker Image
+      - name: Build Docker Image
+        run: docker build -t devops-app:latest .
+
+      # 6. Déployer le container
+      - name: Deploy container
+        run: |
+          docker stop devops-container || true
+          docker rm devops-container || true
+          docker run -d -p 5000:5000 --name devops-container devops-app:latest
+
+      # 7. Tester que le container répond
+      - name: Test container HTTP
+        run: |
+          echo "Attente 5s pour le démarrage du container..."
+          sleep 5
+          curl -s http://localhost:5000
